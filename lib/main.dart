@@ -37,21 +37,50 @@ class _MyHomePageState extends State<MyHomePage> {
   int _flowTime = 60;
   int _breakTime = 20;
 
+  bool _isPlaying;
+
   double doubleConverter(double d) => d / _flowTime;
 
   Timer _timer;
 
-  void _startTimer() {
-    _counter = _flowTime;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _isPlaying = false;
+  }
+
+  void _timerHandler() {
+    if (_isPlaying == true) {
+      setState(() {
+        _isPlaying = false;
+      });
+      _pauseTimer();
+    } else {
+      _startTimer(_counter);
+    }
+  }
+
+  void _startTimer(int timerDuration) {
+    // _counter = _flowTime;
+    setState(() {
+      _isPlaying = true;
+    });
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (_counter > 0) {
           _counter--;
         } else {
           _timer.cancel();
+          _isPlaying = false;
         }
       });
     });
+  }
+
+  void _pauseTimer() {
+    print(_counter);
+    _timer.cancel();
   }
 
   String formatTime(double time) {
@@ -92,9 +121,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _startTimer,
-        tooltip: 'play',
-        child: Icon(Icons.play_arrow),
+        onPressed: _timerHandler,
+        tooltip: _isPlaying ? 'pause' : 'play',
+        child: _isPlaying ? Icon(Icons.pause) : Icon(Icons.play_arrow),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
