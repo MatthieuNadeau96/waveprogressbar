@@ -100,18 +100,34 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Container(
-              height: 350,
-              width: 350,
-              child: LiquidCircularProgressIndicator(
-                value: doubleConverter(_counter.toDouble()),
-                valueColor:
-                    AlwaysStoppedAnimation(Theme.of(context).primaryColor),
-                backgroundColor: Colors.white,
-                borderColor: Colors.grey[300],
-                borderWidth: 0,
-                direction: Axis.vertical,
-              ),
+            Stack(
+              children: [
+                Container(
+                  height: 350,
+                  width: 350,
+                  child: LiquidCircularProgressIndicator(
+                    value: doubleConverter((_counter.toDouble()) + 1.5),
+                    valueColor: AlwaysStoppedAnimation(Colors.blue[300]),
+                    backgroundColor: Colors.transparent,
+                    borderColor: Colors.transparent,
+                    borderWidth: 0,
+                    direction: Axis.vertical,
+                  ),
+                ),
+                Container(
+                  height: 350,
+                  width: 350,
+                  child: LiquidCircularProgressIndicator(
+                    value: doubleConverter(_counter.toDouble()),
+                    valueColor:
+                        AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+                    backgroundColor: Colors.transparent,
+                    borderColor: Colors.transparent,
+                    borderWidth: 0,
+                    direction: Axis.vertical,
+                  ),
+                ),
+              ],
             ),
             Text(
               formatTime(_counter.toDouble()),
