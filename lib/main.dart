@@ -36,18 +36,21 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 60;
   int _flowTime = 60;
   int _breakTime = 20;
+  int _coffeeTime = 20;
+  int _coffeeCounter = 20;
 
   bool _isPlaying;
-
-  double doubleConverter(double d) => d / _flowTime;
+  bool _isCoffeePlaying;
 
   Timer _timer;
+  Timer _coffeeTimer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _isPlaying = false;
+    _isCoffeePlaying = false;
   }
 
   void _timerHandler() {
@@ -57,12 +60,12 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       _pauseTimer();
     } else {
-      _startTimer(_counter);
+      _startTimer(_flowTime);
     }
   }
 
   void _startTimer(int timerDuration) {
-    // _counter = _flowTime;
+    _counter = timerDuration;
     setState(() {
       _isPlaying = true;
     });
@@ -83,12 +86,47 @@ class _MyHomePageState extends State<MyHomePage> {
     _timer.cancel();
   }
 
+  void _coffeeTimerHandler() {
+    if (_isCoffeePlaying == true) {
+      setState(() {
+        _isCoffeePlaying = false;
+      });
+      _pauseTimer();
+    } else {
+      _startCoffeeTimer(_coffeeTime);
+    }
+  }
+
+  void _startCoffeeTimer(int timerDuration) {
+    _coffeeCounter = timerDuration;
+    setState(() {
+      _isCoffeePlaying = true;
+    });
+    _coffeeTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_coffeeCounter > 0) {
+          _coffeeCounter--;
+        } else {
+          _coffeeTimer.cancel();
+          _isCoffeePlaying = false;
+        }
+      });
+    });
+  }
+
+  void _pauseCoffeeTimer() {
+    print(_coffeeCounter);
+    _coffeeTimer.cancel();
+  }
+
   String formatTime(double time) {
     Duration duration = Duration(seconds: time.round());
     return [duration.inMinutes, duration.inSeconds]
         .map((seg) => seg.remainder(60).toString().padLeft(2, '0'))
         .join(':');
   }
+
+  double doubleConverter(double d, int time) => d / time;
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +141,11 @@ class _MyHomePageState extends State<MyHomePage> {
             Stack(
               children: [
                 Container(
-                  height: 350,
-                  width: 350,
+                  height: 250,
+                  width: 250,
                   child: LiquidCircularProgressIndicator(
-                    value: doubleConverter((_counter.toDouble()) + 1.5),
+                    value:
+                        doubleConverter((_counter.toDouble()) + 1.5, _flowTime),
                     valueColor: AlwaysStoppedAnimation(Colors.blue[300]),
                     backgroundColor: Colors.transparent,
                     borderColor: Colors.transparent,
@@ -115,10 +154,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Container(
-                  height: 350,
-                  width: 350,
+                  height: 250,
+                  width: 250,
                   child: LiquidCircularProgressIndicator(
-                    value: doubleConverter(_counter.toDouble()),
+                    value: doubleConverter(_counter.toDouble(), _flowTime),
                     valueColor:
                         AlwaysStoppedAnimation(Theme.of(context).primaryColor),
                     backgroundColor: Colors.transparent,
@@ -132,6 +171,58 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               formatTime(_counter.toDouble()),
               style: Theme.of(context).textTheme.headline4,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(),
+                GestureDetector(
+                  onTap: _coffeeTimerHandler,
+                  child: Container(
+                    margin: EdgeInsets.only(right: 30),
+                    child: Column(
+                      children: [
+                        Stack(
+                          children: [
+                            Container(
+                              height: 50,
+                              width: 50,
+                              child: LiquidCircularProgressIndicator(
+                                value: doubleConverter(
+                                    (_coffeeCounter.toDouble()) + 2,
+                                    _coffeeTime),
+                                valueColor:
+                                    AlwaysStoppedAnimation(Colors.brown[300]),
+                                backgroundColor: Colors.transparent,
+                                borderColor: Colors.transparent,
+                                borderWidth: 0,
+                                direction: Axis.vertical,
+                              ),
+                            ),
+                            Container(
+                              height: 50,
+                              width: 50,
+                              child: LiquidCircularProgressIndicator(
+                                value: doubleConverter(
+                                    _coffeeCounter.toDouble(), _coffeeTime),
+                                valueColor:
+                                    AlwaysStoppedAnimation(Colors.brown[600]),
+                                backgroundColor: Colors.transparent,
+                                borderColor: Colors.transparent,
+                                borderWidth: 0,
+                                direction: Axis.vertical,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          formatTime(_coffeeCounter.toDouble()),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
